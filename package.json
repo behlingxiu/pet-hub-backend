@@ -1,0 +1,20 @@
+{
+  "name": "pet-hub-backend",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "npx node server.js",
+    "start:dev": "npx nodemon server.js",
+    "test": "npx prisma migrate deploy && npx jest -i"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^4.11.0",
+    "express": "^4.18.2",
+    "prisma": "^4.11.0"
+  }
+}
