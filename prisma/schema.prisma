@@ -21,6 +21,7 @@ model User {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   products    Product[]
+  order_detail Order_detail[] //bridge with order_detail
 }
 
 model Product {
@@ -32,8 +33,9 @@ model Product {
   price       Float 
   stock       Int      @default(0)
   userId      Int   
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   images      Image[]
+  order_item  Order_item[]
 
   @@index([userId])
 }
@@ -42,7 +44,54 @@ model Image {
   id          Int      @id @default(autoincrement())
   url         String   @db.VarChar(260)
   productId   Int
-  product     Product  @relation(fields: [productId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId])
+}
+
+// model Transaction{
+//     id          Int       @id @default(autoincrement())
+//     amount      Float 
+//     createdAt   DateTime  @default(now())
+//     userId      Int   
+//     user        User    
+// }
+model Payment {
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  amount        Int
+  order_detail_Id       Int
+  order_detail         Order_detail   @relation(fields: [order_detail_Id], references: [id])
+
+  @@index([order_detail_Id])
+
+}
+
+model Order_detail {
+  id                Int         @id @default(autoincrement())
+  createdAt         DateTime    @default(now())
+  shipping_address  String      @db.VarChar(260) 
+  contact_number    String      @db.VarChar(260) 
+  receiver          String      @db.VarChar(260) 
+  userId            Int   
+  user              User        @relation(fields: [userId], references: [id])
+  payment           Payment[]
+  order_item         Order_item[]
+
+  @@index([userId])
+}
+
+
+model Order_item {
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  quantity      Int
+  productId     Int
+  product       Product  @relation(fields: [productId], references: [id])
+  order_detail_Id       Int
+  order_detail         Order_detail   @relation(fields: [order_detail_Id], references: [id])
+
+  @@index([productId])
+  @@index([order_detail_Id])
+
 }

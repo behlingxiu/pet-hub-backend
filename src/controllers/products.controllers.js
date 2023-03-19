@@ -48,4 +48,35 @@ router.get('/', async (req,res) => {
     res.json(data)
 })
 
+//get data for profile - listing
+  router.get('/mylisting', async(req, res) => {
+
+    const token = req.headers.authorization
+    const user = await verifyAccessToken(token)
+
+    const data = await prisma.product.findMany({
+      where: {
+        userId: user.payload.id
+      }
+    })
+
+    if (data) {
+      res.json(data)
+    } else {
+      res.status(400).send({message: 'No record found!'})
+    }
+  })
+
+  //delete product from listing
+  router.delete('/mylisting/:id', async(req, res) => {
+    const id  = req.params.id
+    const data = await prisma.product.delete({
+        where: {
+            id : parseInt(id)
+        },
+      })
+      res.json(data)
+   })
+
+
 export default router
