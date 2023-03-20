@@ -65,7 +65,19 @@ router.post('/', async (req, res) => {
       include: {
         products: {
           include: {
-            images: true
+            images: true,
+            order_item: {
+              include: {
+                order_detail: {
+                  select: {
+                    id: true,
+                    receiver: true,
+                    contact_number: true,
+                    shipping_address: true
+                  }
+                }
+              }
+            }
           }
         }, 
         order_detail: {
@@ -79,7 +91,8 @@ router.post('/', async (req, res) => {
                       select: {
                         name: true
                       }
-                    }
+                    },
+                    images: true
                   }
                 }
               }
@@ -89,11 +102,11 @@ router.post('/', async (req, res) => {
       }
     })
 
-    const resp = await prisma.product.findUnique({
-      where: {
-        id: data.data.product.id
-      }
-    })
+    // const resp = await prisma.product.findUnique({
+    //   where: {
+    //     id: data.data.product.id
+    //   }
+    // })
 
     if (data) {
       res.json(data)
