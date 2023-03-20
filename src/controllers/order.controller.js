@@ -9,7 +9,7 @@ const router = express.Router()
 const stripe = new Stripe('sk_test_51MnGVmDEnY1U6RXxz4NO8VqYta8cJ0KHZE4j6E8EGf8mrp5a8QM4Y8R3zMOBrJRJYZYKgWI73BW7ROghcAt2hdvL00DQxUZmD4');
 
 router.post('/create-checkout-session', async (req, res) => {
-    const amount = parseFloat(req.body.sum)
+  const amount = parseFloat(req.body.sum)
   const session = await stripe.checkout.sessions.create({
     line_items: [
       {
@@ -18,14 +18,14 @@ router.post('/create-checkout-session', async (req, res) => {
           product_data: {
             name: 'Total',
           },
-          unit_amount: amount*100,
+          unit_amount: parseInt(amount*100),
         },
         quantity: 1,
       },
     ],
     mode: 'payment',
     success_url: `http://localhost:5173/success?id=${req.body.id}`,
-    cancel_url: 'http://localhost:5173/',
+    cancel_url: `http://localhost:5173/cancel?id=${req.body.id}`,
   });
 
   res.json({url: session.url})
@@ -58,7 +58,7 @@ router.post('/', async (req,res) => {
                     shipping_address: data.address,
                     payment: {
                         create: {
-                            amount: parseFloat(data.amount)*100,
+                            amount: parseInt(parseFloat(data.amount)*100),
                             // status: 'pending'
                         },
                     },
@@ -88,27 +88,33 @@ router.post('/', async (req,res) => {
     })
 }) 
 
-router.post('/success', async (req,res) => {
-    const id = req.body.id
-    console.log(req.body.id)
+router.post('/complete', async (req,res) => {
+    const id = parseInt(req.body.id)
+    const success = req.body.success
     prisma.order_detail.update({
         where: {
             id: id
         },
         data: {
-            status : 'success',
+            status : success ? 'success' : 'cancelled' ,
             payment: {
                 update: {
                     where: {
-                        order_detail_Id : id
+                        id: id
                     },
                     data : {
-                        status: 'success'
+                        status: success ? 'success' : 'cancelled'
                     }
                 }
             }
         }
     })
+    .then(resp => {
+        return res.json(resp)
+    }).catch(err => {
+        throw err  // if this happens, our backend application will crash and not respond to the client. because we don't recognize this error yet, we don't know how to handle it in a friendly manner. we intentionally throw an error so that the error monitoring service we'll use in production will notice this error and notify us and we can then add error handling to take care of previously unforeseen errors.
+    })
+
 })
 
 export default router
