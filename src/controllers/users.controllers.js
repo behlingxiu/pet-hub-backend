@@ -67,7 +67,31 @@ router.post('/', async (req, res) => {
           include: {
             images: true
           }
+        }, 
+        order_detail: {
+          include: {
+            payment: true,
+            order_item: {
+              include: {
+                product: {
+                  include: {
+                    user: {
+                      select: {
+                        name: true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
+      }
+    })
+
+    const resp = await prisma.product.findUnique({
+      where: {
+        id: data.data.product.id
       }
     })
 
