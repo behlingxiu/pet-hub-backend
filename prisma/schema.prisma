@@ -11,31 +11,31 @@ datasource db {
 }
 
 model User {
-  id          Int       @id @default(autoincrement())
-  name        String    @db.VarChar(260)
-  email       String    @unique @db.VarChar(260)
-  password    String    @db.VarChar(260)
-  gender      String?   @db.VarChar(260) 
-  address     String?   @db.VarChar(260) 
-  profilepic  String?   @db.VarChar(260) 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  products    Product[]
-  order_detail Order_detail[] //bridge with order_detail
+  id           Int       @id @default(autoincrement())
+  name         String    @db.VarChar(260)
+  email        String    @unique @db.VarChar(260)
+  password     String    @db.VarChar(260)
+  gender       String?   @db.VarChar(260) 
+  address      String?   @db.VarChar(260) 
+  profilepic   String?   @db.VarChar(260) 
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  products     Product[]
+  order_detail Order_detail[]
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  title       String   @db.VarChar(260)
-  description String
-  category    String   @default("Dog") 
-  condition   String 
-  price       Float 
-  stock       Int      @default(0)
-  userId      Int   
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  images      Image[]
-  order_item  Order_item[]
+  id           Int      @id @default(autoincrement())
+  title        String   @db.VarChar(260)
+  description  String
+  category     String   @default("Dog") 
+  condition    String 
+  price        Float 
+  stock        Int      @default(0)
+  userId       Int   
+  user         User     @relation(fields: [userId], references: [id])
+  images       Image[]
+  order_item   Order_item[]
 
   @@index([userId])
 }
@@ -49,34 +49,27 @@ model Image {
   @@index([productId])
 }
 
-// model Transaction{
-//     id          Int       @id @default(autoincrement())
-//     amount      Float 
-//     createdAt   DateTime  @default(now())
-//     userId      Int   
-//     user        User    
-// }
 model Payment {
-  id            Int       @id @default(autoincrement())
-  createdAt     DateTime  @default(now())
-  amount        Int
-  order_detail_Id       Int
-  order_detail         Order_detail   @relation(fields: [order_detail_Id], references: [id])
-
+  id              Int       @id @default(autoincrement())
+  createdAt       DateTime  @default(now())
+  amount          Int     
+  status          String    @default("pending")
+  order_detail_Id Int
+  order_detail    Order_detail   @relation(fields: [order_detail_Id], references: [id])
   @@index([order_detail_Id])
-
 }
 
 model Order_detail {
-  id                Int         @id @default(autoincrement())
-  createdAt         DateTime    @default(now())
-  shipping_address  String      @db.VarChar(260) 
-  contact_number    String      @db.VarChar(260) 
-  receiver          String      @db.VarChar(260) 
+  id                Int          @id @default(autoincrement())
+  createdAt         DateTime     @default(now())
+  shipping_address  String       @db.VarChar(260) 
+  contact_number    String       @db.VarChar(260) 
+  receiver          String       @db.VarChar(260) 
   userId            Int   
-  user              User        @relation(fields: [userId], references: [id])
-  payment           Payment[]
-  order_item         Order_item[]
+  user              User         @relation(fields: [userId], references: [id])
+  payment           Payment[]    
+  order_item        Order_item[]
+  status            String       @default("pending")
 
   @@index([userId])
 }
@@ -93,5 +86,4 @@ model Order_item {
 
   @@index([productId])
   @@index([order_detail_Id])
-
 }

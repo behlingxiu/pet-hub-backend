@@ -43,8 +43,31 @@ router.post('/', async (req,res) => {
     })
 })
 
+router.get('/:id', async (req,res) => {
+    const id = req.params.id
+   
+    const data = await prisma.product.findUnique({
+        where: {
+            id: parseInt(id)
+        },
+        include: {
+            images: true
+        }
+    })
+
+    if (data) {
+        res.json(data)
+    } else {
+        res.status(400).send({message: 'No record found!'})
+    }
+    
+})
+
 router.get('/', async (req,res) => {
-    const data = await prisma.product.findMany()
+    const data = await prisma.product.findMany({
+        include: {
+            images: true
+        }})
     res.json(data)
 })
 
