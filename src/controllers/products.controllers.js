@@ -63,6 +63,39 @@ router.get('/:id', async (req,res) => {
     
 })
 
+//get data for profile - listing
+router.get('/mylisting', async(req, res) => {
+
+    const token = req.headers.authorization
+    const user = await verifyAccessToken(token)
+
+    const data = await prisma.product.findMany({
+      where: {
+        userId: user.payload.id
+      }
+    })
+
+    if (data) {
+      res.json(data)
+    } else {
+      res.status(400).send({message: 'No record found!'})
+    }
+  })
+
+  //delete product from listing
+  router.delete('/mylisting/:id', async(req, res) => {
+    const id  = req.params.id
+    const data = await prisma.product.delete({
+        where: {
+            id : parseInt(id),
+        },
+        include: {
+            images: true
+        }
+      })
+      res.json(data)
+   })
+
 router.get('/category/:category', async (req,res) => {
     const categories = req.params.category
     console.log(categories)
