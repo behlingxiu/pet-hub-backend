@@ -33,7 +33,7 @@ model Product {
   price        Float 
   stock        Int      @default(0)
   userId       Int   
-  user         User     @relation(fields: [userId], references: [id])
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   images       Image[]
   order_item   Order_item[]
 
@@ -44,7 +44,7 @@ model Image {
   id          Int      @id @default(autoincrement())
   url         String   @db.VarChar(260)
   productId   Int
-  product     Product  @relation(fields: [productId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId])
 }
@@ -55,7 +55,7 @@ model Payment {
   amount          Int     
   status          String    @default("pending")
   order_detail_Id Int
-  order_detail    Order_detail   @relation(fields: [order_detail_Id], references: [id])
+  order_detail    Order_detail   @relation(fields: [order_detail_Id], references: [id], onDelete: Cascade)
   @@index([order_detail_Id])
 }
 
@@ -80,9 +80,9 @@ model Order_item {
   createdAt     DateTime  @default(now())
   quantity      Int
   productId     Int
-  product       Product  @relation(fields: [productId], references: [id])
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   order_detail_Id       Int
-  order_detail         Order_detail   @relation(fields: [order_detail_Id], references: [id])
+  order_detail         Order_detail   @relation(fields: [order_detail_Id], references: [id], onDelete: Cascade)
 
   @@index([productId])
   @@index([order_detail_Id])
