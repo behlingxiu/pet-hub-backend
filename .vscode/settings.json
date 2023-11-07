@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5444,
+            "driver": "PostgreSQL",
+            "name": "pet",
+            "database": "pet-hub",
+            "username": "pet",
+            "password": "pet"
+        }
+    ]
+}

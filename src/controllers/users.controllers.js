@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs"
 import { Prisma } from "@prisma/client"
 import prisma from "../utils/prisma.js"
 import { validateUser } from "../validators/users.js"
-import { signAccessToken } from '../utils/jwt.js'
+import { signAccessToken, verifyAccessToken } from '../utils/jwt.js'
 import { filter } from "../utils/common.js"
 // import sgMail from '@sendgrid/mail'
 const router = express.Router()
@@ -52,5 +52,68 @@ router.post('/', async (req, res) => {
     })
     
   })
+
+  //get user data for user profile
+  router.get('/', async(req, res) => {
+    const token = req.headers.authorization
+    const user = await verifyAccessToken(token)
+
+    const data = await prisma.user.findUnique({
+      where: {
+        id: user.payload.id
+      },
+      include: {
+        products: {
+          include: {
+            images: true,
+            order_item: {
+              include: {
+                order_detail: {
+                  select: {
+                    id: true,
+                    receiver: true,
+                    contact_number: true,
+                    shipping_address: true
+                  }
+                }
+              }
+            }
+          }
+        }, 
+        order_detail: {
+          include: {
+            payment: true,
+            order_item: {
+              include: {
+                product: {
+                  include: {
+                    user: {
+                      select: {
+                        name: true
+                      }
+                    },
+                    images: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+
+    // const resp = await prisma.product.findUnique({
+    //   where: {
+    //     id: data.data.product.id
+    //   }
+    // })
+
+    if (data) {
+      res.json(data)
+    } else {
+      res.status(400).send({message: 'No record found!'})
+    }
+  })
+  
 
   export default router
